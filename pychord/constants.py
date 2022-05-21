@@ -1,0 +1,1 @@
+JSON_RPC_SUBURL = "/json-rpc/v0"

@@ -64,6 +64,14 @@ def get_all_kv_pairs(conn: sqlite.Connection) -> Dict[str, Any]:
         }
 
 
+def get_kv_pair_count(conn: sqlite.Connection) -> int:
+    with cursor_manager(conn) as c:
+        c.execute(
+            "SELECT COUNT(key) AS pair_count FROM kv_store"
+        )
+        return c.fetchone()["pair_count"]
+
+
 def does_key_exist(conn: sqlite.Connection, key) -> bool:
     with cursor_manager(conn) as c:
         c.execute(

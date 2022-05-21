@@ -3,18 +3,23 @@ from bottle import Bottle
 import logging
 
 from pychord.node import Node
+from pychord.constants import JSON_RPC_SUBURL
 
 
 rpc_server_logger = logging.getLogger(__name__)
 
 
 def attach_rpc(app: Bottle, node: Node):
-    rpc_plugin = TinyRPCPlugin("/")
+    rpc_plugin = TinyRPCPlugin(JSON_RPC_SUBURL)
     app.install(rpc_plugin)
 
     @rpc_plugin.public
     def ping():
         return "pong"
+
+    @rpc_plugin.public
+    def join(other_addr):
+        return node.join(other_addr)
 
     @rpc_plugin.public
     def find_successor(identifier):
@@ -61,6 +66,11 @@ def attach_rpc(app: Bottle, node: Node):
         return node.set_local(key, value)
 
     @rpc_plugin.public
+    def set_local_bulk(bulk_dict):
+        rpc_server_logger.info("Setting local bulk key/value pairs...")
+        return node.set_local_bulk(bulk_dict)
+
+    @rpc_plugin.public
     def set(key, value):
         rpc_server_logger.info("Setting key/value pair: {0}/{1}".format(key, value))
         return node.set(key, value)
@@ -82,3 +92,7 @@ def attach_rpc(app: Bottle, node: Node):
     @rpc_plugin.public
     def dump_db():
         return node.dump_db()
+
+    @rpc_plugin.public
+    def get_local_pair_count():
+        return node.get_local_pair_count()
